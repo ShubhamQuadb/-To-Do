@@ -10,48 +10,62 @@ interface Todo {
   isEditing: boolean;
 }
 
-const listVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1, 
-    },
-  },
-};
-
-
-
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
 
   const handleAddTodo = () => {
-    if (input.trim() === '') return;
-    const newTodo: Todo = { id: Date.now(), text: input.trim(), isEditing: false };
+    if (!input.trim()) return;
+    const newTodo: Todo = {
+      id: Date.now(),
+      text: input.trim(),
+      isEditing: false,
+    };
     setTodos([...todos, newTodo]);
     setInput('');
   };
 
   const handleDelete = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   const handleEdit = (id: number) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
-    ));
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
+      )
+    );
   };
 
   const handleUpdate = (id: number, text: string) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, text, isEditing: false } : todo
-    ));
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, text, isEditing: false } : todo
+      )
+    );
   };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6">
-        <h2 className="text-3xl font-bold text-center text-orange-600 mb-6">🔥 My To-Do List</h2>
+        <div className="text-3xl font-bold text-center text-orange-600 mb-6 flex justify-center">
+          {' My To-Do List'.split('').map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{
+                type: 'spring',
+                stiffness: 500,
+                damping: 10,
+                delay: index * 0.05,
+              }}
+              className="inline-block"
+            >
+              {char}
+            </motion.span>
+          ))}
+        </div>
 
         <div className="flex mb-4">
           <input
@@ -69,22 +83,18 @@ export default function TodoList() {
           </button>
         </div>
 
-        <motion.ul
-          className="space-y-3 max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 pr-1"
-          variants={listVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {todos.map(todo => (
+        <ul className="space-y-3 max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 pr-1">
+          {todos.map((todo, i) => (
             <TodoItem
               key={todo.id}
               todo={todo}
+              index={i}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onUpdate={handleUpdate}
             />
           ))}
-        </motion.ul>
+        </ul>
       </div>
     </div>
   );

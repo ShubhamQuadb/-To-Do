@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 interface Todo {
   id: number;
@@ -13,29 +14,62 @@ interface Props {
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   onUpdate: (id: number, text: string) => void;
+  index: number;
 }
 
-export default function TodoItem({ todo, onEdit, onDelete, onUpdate }: Props) {
+export default function TodoItem({ todo, onEdit, onDelete, onUpdate, index }: Props) {
+  const [editText, setEditText] = useState(todo.text);
+
+  useEffect(() => {
+    if (todo.isEditing) {
+      setEditText(todo.text);
+    }
+  }, [todo.isEditing, todo.text]);
+
+  const handleSave = () => {
+    onUpdate(todo.id, editText.trim());
+  };
+
   return (
-    <li className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition">
+    <motion.li
+      initial={{ opacity: 0, y: -30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 500,
+        damping: 20,
+        delay: index * 0.08,
+      }}
+      className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition"
+    >
       {todo.isEditing ? (
         <input
-          className="flex-1 px-3 py-2 border border-orange-300 rounded-md mr-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="flex-1 px-3 py-2 border border-orange-300 rounded-md mr-3 focus:outline-none focus:ring-2 focus:ring-orange-400 text-black"
           type="text"
-          value={todo.text}
-          onChange={(e) => onUpdate(todo.id, e.target.value)}
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
         />
       ) : (
         <span className="flex-1 text-gray-800 font-medium">{todo.text}</span>
       )}
       <div className="flex gap-2 ml-3">
-        <button
-          onClick={() => onEdit(todo.id)}
-          className="text-orange-600 hover:text-orange-800 text-lg transition"
-          title={todo.isEditing ? 'Save' : 'Edit'}
-        >
-          {todo.isEditing ? '✔' : '✏️'}
-        </button>
+        {todo.isEditing ? (
+          <button
+            onClick={handleSave}
+            className="text-green-600 hover:text-green-800 text-lg transition"
+            title="Save"
+          >
+            ✔
+          </button>
+        ) : (
+          <button
+            onClick={() => onEdit(todo.id)}
+            className="text-orange-600 hover:text-orange-800 text-lg transition"
+            title="Edit"
+          >
+            ✏️
+          </button>
+        )}
         <button
           onClick={() => onDelete(todo.id)}
           className="text-red-500 hover:text-red-700 text-lg transition"
@@ -44,6 +78,6 @@ export default function TodoItem({ todo, onEdit, onDelete, onUpdate }: Props) {
           🗑️
         </button>
       </div>
-    </li>
+    </motion.li>
   );
 }
