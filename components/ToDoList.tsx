@@ -19,27 +19,6 @@ const listVariants = {
   },
 };
 
-const headingVariants = {
-  hidden: { opacity: 1 },
-  visible: {
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-};
-
-const letterVariants = {
-  hidden: { y: -20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 500,
-      damping: 10,
-    },
-  },
-};
 
 
 export default function TodoList() {
